@@ -1,0 +1,9 @@
+.eachSlide{
+    display: flex;
+    justify-content: center;
+    background-size: contain;
+    background-position: center;
+    min-height: 650px;
+    overflow: hidden;
+}
+
