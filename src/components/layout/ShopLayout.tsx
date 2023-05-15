@@ -1,7 +1,7 @@
 import Head from "next/head";
 import React from "react";
 import { FC } from "react";
-import { Navbar, SideMenu} from "../ui";
+import { Navbar, SideMenu } from "../ui";
 
 
 
@@ -30,9 +30,9 @@ export const ShopLayout: FC<Props> = ({
         {imageFullUrl && <meta name="og:image" content={imageFullUrl} />}
       </Head>
       <nav>
-        <Navbar/>
+        <Navbar />
       </nav>
-      <SideMenu/>
+      <SideMenu />
       <main
         style={{
           margin: "80px auto",
@@ -42,7 +42,8 @@ export const ShopLayout: FC<Props> = ({
       >
         {children}
       </main>
-      <footer></footer>
+      <footer>
+      </footer>
     </>
   );
 };

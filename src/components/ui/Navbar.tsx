@@ -14,7 +14,7 @@ import {
 import NextLink from "next/link";
 import { ClearOutlined, SearchOutlined, ShoppingCartOutlined } from "@mui/icons-material";
 import { useRouter } from "next/router";
-import { UiContext } from "../../../context";
+import { CartContext, UiContext } from "../../../context";
 
 
 export const Navbar = () => {
@@ -23,6 +23,8 @@ export const Navbar = () => {
     const { toggleSideMenu } = useContext(UiContext)
     const { asPath, push } = useRouter()
     const [searchTerm, setSearchTerm] = useState('')
+
+    const {numberOfItems} = useContext(CartContext)
 
     const onSearchTerm = () => {
         setIsSearchVisible(false)
@@ -78,7 +80,7 @@ export const Navbar = () => {
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                             type='text'
-                            placeholder="Buscar..."
+                            placeholder="Buscar en el sitio web"
                             endAdornment={
                                 <InputAdornment position="end">
                                     <IconButton
@@ -111,7 +113,7 @@ export const Navbar = () => {
                 <NextLink legacyBehavior href={"/cart"} passHref>
                     <Link>
                         <IconButton>
-                            <Badge badgeContent={2} color="secondary">
+                            <Badge badgeContent={numberOfItems > 9 ? '+9' : numberOfItems} color="secondary">
                                 <ShoppingCartOutlined />
                             </Badge>
                         </IconButton>

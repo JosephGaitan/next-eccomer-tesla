@@ -3,9 +3,17 @@ import { lightTheme } from "@/themes";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import type { AppProps } from "next/app";
 import { SWRConfig } from "swr";
-import { UiProvider } from "../../context";
+import { AuthProvider, CartProvider, UiProvider } from "../../context";
+import { useEffect, useState } from "react";
 
 export default function App({ Component, pageProps }: AppProps) {
+
+  const [active, setActive] = useState(false)
+
+  useEffect(() => {
+    setActive(true)
+  }, [])
+
   return (
 
     <SWRConfig
@@ -13,14 +21,16 @@ export default function App({ Component, pageProps }: AppProps) {
         fetcher: (resource, init) => fetch(resource, init).then(res => res.json())
       }}
     >
-      <UiProvider>
-        <ThemeProvider theme={lightTheme}>
-          <CssBaseline />
-          <Component {...pageProps} />
-        </ThemeProvider>
-
-      </UiProvider>
-
+      <AuthProvider>
+        <CartProvider>
+          <UiProvider>
+            <ThemeProvider theme={lightTheme}>
+              <CssBaseline />
+              {active && <Component {...pageProps} />}
+            </ThemeProvider>
+          </UiProvider>
+        </CartProvider>
+      </AuthProvider>
     </SWRConfig>
   );
 }

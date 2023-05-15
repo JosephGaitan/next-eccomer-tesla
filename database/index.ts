@@ -5,4 +5,4 @@ export * from './constants'
 
 //prueba data base
 
-export * as seedDataBase  from './products'
+export * as seedDataBase  from './seed-data'

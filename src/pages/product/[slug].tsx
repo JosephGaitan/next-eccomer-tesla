@@ -1,15 +1,17 @@
+import React, { useContext, useState } from 'react'
+import { useRouter } from 'next/router'
+import { CartContext } from '../../../context'
+
+import { NextPage, GetStaticPaths, GetStaticProps } from 'next'
+
+import { ISize, IcartProducts, Iproducts } from '../../../interfaces'
 
 import { Box, Button, Chip, Grid, Typography } from '@mui/material'
 import { dbProducts } from '../../../database'
-import { initialData } from '../../../database/products'
-import { Iproducts } from '../../../interfaces'
 import { ItemCounter } from '@/components/ui'
-import { NextPage, GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next'
 import { ProductSlideShow } from '@/components/products/ProductSlideShow'
-import { redirect } from 'next/dist/server/api-utils'
 import { ShopLayout } from '@/components/layout'
 import { SizeSelector } from '@/components/products'
-import React from 'react'
 
 
 interface Props {
@@ -17,9 +19,38 @@ interface Props {
 }
 
 const ProductPage: NextPage<Props> = ({ product }) => {
-  //const router = useRouter()
-  //const  {products: product, isLoading, isError} = useProducts(`/product/${router.query.slug}`)
 
+  const router = useRouter()
+  const {addProductToCart} = useContext(CartContext)
+
+  const selectedSize = (size:ISize) => {
+    setTempCartProduct(currentProduct => ({
+      ...currentProduct, size
+    }))
+  }
+
+  const onUpdateQuantity = (quantity: number) => {
+    setTempCartProduct(currentProduct => ({
+      ...currentProduct, quantity
+    }))
+  }
+
+  const onAddProduct = () => {
+    if (!tempCartProduct.size) { return}
+    addProductToCart(tempCartProduct);
+    router.push('/cart')
+  }
+
+  const [tempCartProduct, setTempCartProduct] = useState<IcartProducts>({
+    _id: product._id,
+  image: product.images[0],
+  price: product.price,
+  size: undefined,
+  slug: product.slug,
+  title: product.title,
+  gender: product.gender,
+  quantity: 1
+  })
 
   return (
     <ShopLayout title={product.title} pageDescription={product.description}>
@@ -41,13 +72,36 @@ const ProductPage: NextPage<Props> = ({ product }) => {
               <Typography variant='subtitle2'>
                 Cantidad
               </Typography>
-              <ItemCounter />
-              <SizeSelector selectedSize={product.sizes[2]} sizes={product.sizes} />
+              <ItemCounter
+                currentValue={tempCartProduct.quantity}
+                updatedQuantity={onUpdateQuantity}
+                maxValue={product.inStock > 5 ? 5 : product.inStock}
+              />
+              <SizeSelector 
+                selectedSize={tempCartProduct.size} 
+                sizes={product.sizes} 
+                onSelectedSize={(size)=>selectedSize(size)}
+              />
             </Box>
-            <Button color='secondary' className='circular-btn'>
-              Agregar al Carrito
-            </Button>
-            {/*<Chip label='No hay disponibles' color='error' variant='outlined'/>*/}
+
+            {
+              product.inStock > 0 ? (
+                <Button 
+                  color='secondary' 
+                  className='circular-btn'
+                  onClick={() => onAddProduct()}
+                >
+                  {
+                    tempCartProduct.size 
+                    ? 'Agregar al Carrito'
+                    : 'Seleccione una talla'
+                  }
+                </Button>
+              ) : (
+                <Chip label='Sold Out' color='error' variant='outlined' />
+              )
+            }
+
 
             <Box
               sx={{ mt: 3 }}
@@ -70,21 +124,21 @@ const ProductPage: NextPage<Props> = ({ product }) => {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  
+
   const productSlugs = await dbProducts.getAllProductSlug();
 
   return {
-    paths: productSlugs.map(({slug}) =>({
+    paths: productSlugs.map(({ slug }) => ({
       params: {
         slug
       }
     })),
     fallback: "blocking"
   }
-} 
+}
 
-export const getStaticProps: GetStaticProps = async ({params}) => {
-  const {slug = ''} = params as { slug: string}
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const { slug = '' } = params as { slug: string }
   const product = await dbProducts.getProductBySlug(slug);
 
   if (!product) {

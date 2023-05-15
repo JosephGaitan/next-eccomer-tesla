@@ -29,7 +29,7 @@ export const SideMenu = () => {
             onClose={toggleSideMenu}
             open={isOpenMenu}
             anchor='right'
-            sx={{ backdropFilter: 'blur(4px)', transition: 'all 0.5s ease-out' }}
+            sx={{ transition: 'all 0.5s ease-out' }}
         >
             <Box sx={{ width: 250, paddingTop: 5 }}>
 
@@ -51,7 +51,7 @@ export const SideMenu = () => {
                                 value={searchTerm}
                                 onChange={e => setSearchTerm(e.target.value)}
                                 type='text'
-                                placeholder="Buscar..."
+                                placeholder="Buscar en el sitio web"
                                 endAdornment={
                                     <InputAdornment position="end">
                                         <IconButton
